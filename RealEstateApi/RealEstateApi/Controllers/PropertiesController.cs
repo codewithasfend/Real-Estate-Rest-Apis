@@ -58,22 +58,21 @@ namespace RealEstateApi.Controllers
 
             var propertyResult = _dbContext.Properties.Find(id);
 
-            if (propertyResult !=null)
+            if (propertyResult != null)
             {
                 var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
 
+                var result = new
+                {
+                    propertyResult.Id,
+                    propertyResult.Name,
+                    propertyResult.Detail,
+                    propertyResult.Address,
+                    propertyResult.Price,
+                    ImageUrl = $"{baseUrl}/{propertyResult.ImageUrl}",
+                    UserPhone = propertyResult.User.Phone
+                };
 
-                var result = _dbContext.Properties
-                 .Select(p => new
-                 {
-                     p.Id,
-                     p.Name,
-                     p.Detail,
-                     p.Address,
-                     p.Price,
-                     ImageUrl = $"{baseUrl}/{p.ImageUrl}",
-                     p.User.Phone,
-                 }).FirstOrDefault();
                 return Ok(result);
             }
             else
