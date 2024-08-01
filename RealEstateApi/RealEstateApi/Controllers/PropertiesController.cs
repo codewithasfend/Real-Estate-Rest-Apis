@@ -70,7 +70,7 @@ namespace RealEstateApi.Controllers
                     propertyResult.Address,
                     propertyResult.Price,
                     ImageUrl = $"{baseUrl}/{propertyResult.ImageUrl}",
-                    UserPhone = propertyResult.User.Phone
+                    propertyResult.User.Phone
                 };
 
                 return Ok(result);
