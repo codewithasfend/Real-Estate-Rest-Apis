@@ -23,16 +23,8 @@ namespace RealEstateApi.Controllers
         [Authorize]
         public IActionResult GetProperties(int categoryId)
         {
-            var propertiesResult = _dbContext.Properties.Where(c => c.CategoryId==categoryId);
-            if (propertiesResult == null)
-            {
-                return NotFound();
-            }
-
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
-
-
-            var result = _dbContext.Properties
+            var result = _dbContext.Properties.Where(c => c.CategoryId == categoryId)
                  .Select(p => new
                  {
                      p.Id,
@@ -42,6 +34,12 @@ namespace RealEstateApi.Controllers
                      ImageUrl = $"{baseUrl}/{p.ImageUrl}"
 
                  });
+
+            if (!result.Any())
+            {
+                return NotFound();
+            }
+
             return Ok(result);
 
         }
@@ -62,7 +60,7 @@ namespace RealEstateApi.Controllers
 
             if (propertyResult != null)
             {
-                var result = _dbContext.Properties.Where(p=>p.Id == id)
+                var result = _dbContext.Properties.Where(p => p.Id == id)
                  .Select(p => new
                  {
                      p.Id,
@@ -85,15 +83,9 @@ namespace RealEstateApi.Controllers
         [Authorize]
         public IActionResult GetTrendingProperties()
         {
-            var propertiesResult = _dbContext.Properties.Where(c => c.IsTrending == true);
-            if (propertiesResult == null)
-            {
-                return NotFound();
-            }
-
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
 
-            var result = _dbContext.Properties
+            var result = _dbContext.Properties.Where(c => c.IsTrending == true)
               .Select(p => new
               {
                   p.Id,
@@ -103,6 +95,11 @@ namespace RealEstateApi.Controllers
                   ImageUrl = $"{baseUrl}/{p.ImageUrl}",
                   p.IsTrending
               });
+
+            if (!result.Any())
+            {
+                return NotFound();
+            }
             return Ok(result);
 
         }
@@ -111,7 +108,7 @@ namespace RealEstateApi.Controllers
         [Authorize]
         public IActionResult GetSearchProperties(string address)
         {
-            var propertiesResult = _dbContext.Properties.Select(p=> new {p.Id , p.Name, p.Address}).Where(p => p.Address.Contains(address));
+            var propertiesResult = _dbContext.Properties.Select(p => new { p.Id, p.Name, p.Address }).Where(p => p.Address.Contains(address));
             if (propertiesResult == null)
             {
                 return NotFound();
@@ -133,7 +130,7 @@ namespace RealEstateApi.Controllers
             {
                 var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 var user = _dbContext.Users.FirstOrDefault(u => u.Email == userEmail);
-                if (user==null) return NotFound();
+                if (user == null) return NotFound();
                 property.IsTrending = false;
                 property.UserId = user.Id;
                 _dbContext.Properties.Add(property);
